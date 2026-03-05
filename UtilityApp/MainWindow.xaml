@@ -1,0 +1,421 @@
+<Window x:Class="UtilityApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Utility Platform Host"
+        Width="1220"
+        Height="780"
+        MinWidth="1024"
+        MinHeight="640">
+    <Window.Resources>
+        <SolidColorBrush x:Key="ShellBackgroundBrush" Color="#FFF7F9FC" />
+        <SolidColorBrush x:Key="PanelBackgroundBrush" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="PanelBorderBrush" Color="#FFD4DEE8" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#FF1F6E7A" />
+        <SolidColorBrush x:Key="AccentMutedBrush" Color="#FFE4F1F4" />
+        <SolidColorBrush x:Key="HeadingBrush" Color="#FF1A2A35" />
+        <SolidColorBrush x:Key="BodyBrush" Color="#FF455764" />
+        <SolidColorBrush x:Key="GoodBrush" Color="#FF2A8D5C" />
+        <SolidColorBrush x:Key="WarnBrush" Color="#FFB87A22" />
+
+        <Style x:Key="CardBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{StaticResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PanelBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="18" />
+        </Style>
+
+        <Style x:Key="AccentButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="Bahnschrift" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="ButtonRoot"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonRoot" Property="Opacity" Value="0.92" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonRoot" Property="Opacity" Value="0.82" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonRoot" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GhostButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButtonStyle}">
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        </Style>
+
+        <Style x:Key="HeaderIconButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource GhostButtonStyle}">
+            <Setter Property="Width" Value="38" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="8,0,0,0" />
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Normal" />
+        </Style>
+
+        <Style x:Key="ModuleListItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Foreground" Value="{StaticResource BodyBrush}" />
+            <Setter Property="FontFamily" Value="Bahnschrift" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="ListItemBorder"
+                                Padding="{TemplateBinding Padding}"
+                                Background="Transparent"
+                                BorderBrush="#00000000"
+                                BorderThickness="1"
+                                CornerRadius="8">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ListItemBorder" Property="Background" Value="#FFF2F6FB" />
+                                <Setter TargetName="ListItemBorder" Property="BorderBrush" Value="#FFD3E0ED" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ListItemBorder" Property="Background" Value="{StaticResource AccentMutedBrush}" />
+                                <Setter TargetName="ListItemBorder" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource HeadingBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20" Background="{StaticResource ShellBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Padding="22,16"
+                Background="{StaticResource PanelBackgroundBrush}"
+                BorderBrush="{StaticResource PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="Utility Platform"
+                               FontFamily="Segoe UI"
+                               FontSize="24"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HeadingBrush}" />
+                    <TextBlock Margin="0,4,0,0"
+                               Text="Portable host shell for offline enterprise modules"
+                               FontFamily="Segoe UI"
+                               FontSize="13"
+                               Foreground="{StaticResource BodyBrush}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Button Style="{StaticResource HeaderIconButtonStyle}"
+                            ToolTip="Home"
+                            Content="&#xE80F;"
+                            Click="HomeButton_Click" />
+                    <Button Style="{StaticResource HeaderIconButtonStyle}"
+                            ToolTip="Operations"
+                            Content="&#xE713;"
+                            Click="OpenOperationsButton_Click" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,16,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="NavigationPanel"
+                    Grid.Column="0"
+                    Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Module Navigation"
+                               FontFamily="Bahnschrift"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource HeadingBrush}" />
+                    <TextBlock Margin="0,4,0,14"
+                               Text="Pre-plugin layout pass with host-focused views"
+                               FontFamily="Segoe UI"
+                               FontSize="12"
+                               Foreground="{StaticResource BodyBrush}" />
+
+                    <ListBox x:Name="ModuleList"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             SelectionChanged="ModuleList_SelectionChanged"
+                             ItemContainerStyle="{StaticResource ModuleListItemStyle}">
+                        <ListBoxItem Content="Overview" />
+                        <ListBoxItem Content="File Utilities" />
+                        <ListBoxItem Content="Data Tools" />
+                        <ListBoxItem Content="Analytics" />
+                        <ListBoxItem Content="Settings" />
+                    </ListBox>
+
+                    <Border Margin="0,16,0,0"
+                            Padding="12"
+                            Background="#FFF8FBFF"
+                            BorderBrush="#FFD7E4EE"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Text="Runtime Targets"
+                                       FontFamily="Bahnschrift"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource HeadingBrush}" />
+                            <TextBlock Margin="0,6,0,2"
+                                       Text=".NET Framework 4.8"
+                                       FontFamily="Consolas"
+                                       FontSize="12"
+                                       Foreground="{StaticResource BodyBrush}" />
+                            <TextBlock Text="Portable deployment / no installer"
+                                       FontFamily="Segoe UI"
+                                       FontSize="12"
+                                       Foreground="{StaticResource BodyBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer x:Name="WorkspacePanel"
+                          Grid.Column="2"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <StackPanel x:Name="MainSurfacePanel">
+                        <Border Style="{StaticResource CardBorderStyle}">
+                            <StackPanel>
+                                <TextBlock x:Name="ActiveModuleTitle"
+                                           Text="Overview"
+                                           FontFamily="Bahnschrift"
+                                           FontSize="26"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource HeadingBrush}" />
+                                <TextBlock x:Name="ActiveModuleDescription"
+                                           Margin="0,8,0,0"
+                                           Text="Prepare host shell visuals before plugin projects are added."
+                                           TextWrapping="Wrap"
+                                           FontFamily="Segoe UI"
+                                           FontSize="13"
+                                           Foreground="{StaticResource BodyBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,14,0,0" Style="{StaticResource CardBorderStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Main Workspace"
+                                           FontFamily="Bahnschrift"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource HeadingBrush}" />
+                                <TextBlock Margin="0,8,0,0"
+                                           Text="Operational panels such as health checks, activity logs, and host settings are grouped under the separate Operations menu."
+                                           TextWrapping="Wrap"
+                                           FontFamily="Segoe UI"
+                                           FontSize="12"
+                                           Foreground="{StaticResource BodyBrush}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="OperationsMenuPanel" Visibility="Collapsed">
+                        <Border Style="{StaticResource CardBorderStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Operations Menu"
+                                           FontFamily="Bahnschrift"
+                                           FontSize="24"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource HeadingBrush}" />
+                                <TextBlock Margin="0,6,0,0"
+                                           Text="Consolidated health, logging, and settings area."
+                                           FontFamily="Segoe UI"
+                                           FontSize="12"
+                                           Foreground="{StaticResource BodyBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <UniformGrid Margin="0,14,0,0" Columns="2">
+                            <Border Margin="0,0,7,0" Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Host Health"
+                                               FontFamily="Bahnschrift"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource HeadingBrush}" />
+                                    <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                                        <Border Background="#FFE4F4EC"
+                                                CornerRadius="6"
+                                                Padding="8,4"
+                                                Margin="0,0,8,0">
+                                            <TextBlock Text="Startup Ready"
+                                                       FontFamily="Segoe UI"
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource GoodBrush}" />
+                                        </Border>
+                                        <Border Background="#FFFFF3E5"
+                                                CornerRadius="6"
+                                                Padding="8,4">
+                                            <TextBlock Text="Plugin Slots Empty"
+                                                       FontFamily="Segoe UI"
+                                                       FontSize="12"
+                                                       Foreground="{StaticResource WarnBrush}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <TextBlock Margin="0,10,0,0"
+                                               Text="Run basic host checks and plugin discovery from this menu."
+                                               TextWrapping="Wrap"
+                                               FontFamily="Segoe UI"
+                                               FontSize="12"
+                                               Foreground="{StaticResource BodyBrush}" />
+                                    <Button Margin="0,12,0,8"
+                                            Content="Discover Modules"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Click="DiscoverModulesButton_Click" />
+                                    <Button Margin="0"
+                                            Content="Validate Config"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Click="ValidateConfigButton_Click" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Margin="7,0,0,0" Style="{StaticResource CardBorderStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Settings Area"
+                                               FontFamily="Bahnschrift"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource HeadingBrush}" />
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="Configuration and diagnostics controls can be centralized here."
+                                               TextWrapping="Wrap"
+                                               FontFamily="Segoe UI"
+                                               FontSize="12"
+                                               Foreground="{StaticResource BodyBrush}" />
+                                    <TextBlock Margin="0,8,0,0"
+                                               Text="Expected folder: .\Config"
+                                               FontFamily="Consolas"
+                                               FontSize="12"
+                                               Foreground="{StaticResource BodyBrush}" />
+                                    <Button Margin="0,12,0,0"
+                                            Width="180"
+                                            HorizontalAlignment="Left"
+                                            Content="Open Settings Module"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Click="GoToSettingsButton_Click" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <Border Margin="0,14,0,0" Style="{StaticResource CardBorderStyle}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Activity Log"
+                                               FontFamily="Bahnschrift"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource HeadingBrush}" />
+                                    <Button Grid.Column="1"
+                                            Content="Refresh Log View"
+                                            Style="{StaticResource GhostButtonStyle}"
+                                            Margin="12,0,0,0"
+                                            Width="140"
+                                            Click="OpenLogButton_Click" />
+                                </Grid>
+                                <TextBlock Margin="0,0,0,10"
+                                           Text="Host events are recorded here before file logging is wired."
+                                           FontFamily="Segoe UI"
+                                           FontSize="12"
+                                           Foreground="{StaticResource BodyBrush}" />
+                                <ListBox x:Name="ActivityLogList"
+                                         Height="220"
+                                         FontFamily="Consolas"
+                                         FontSize="12"
+                                         BorderBrush="{StaticResource PanelBorderBrush}"
+                                         BorderThickness="1"
+                                         Background="#FFFAFCFF" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="#FFF0F5FA"
+                BorderBrush="{StaticResource PanelBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="10"
+                Padding="12,9">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText"
+                           VerticalAlignment="Center"
+                           FontFamily="Segoe UI"
+                           FontSize="12"
+                           Foreground="{StaticResource BodyBrush}"
+                           Text="Shell initializing..." />
+                <TextBlock Grid.Column="1"
+                           VerticalAlignment="Center"
+                           FontFamily="Consolas"
+                           FontSize="12"
+                           Foreground="{StaticResource BodyBrush}"
+                           Text="Modules Path: .\Modules" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
