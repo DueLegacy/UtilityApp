@@ -1,0 +1,22 @@
+# Visual Studio / MSBuild output
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio state
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code workspace state
+.vscode/
+
+# Local .NET CLI home used by this workspace
+.dotnet_home/
+
+# Runtime logs
+Logs/
+
+# Test results
+TestResults/
