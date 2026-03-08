@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="UtilityApp.Contracts/UtilityApp.Contracts.csproj" Id="1c3a0a53-91f3-4b78-9ae4-3c8e7bfdac17" />
+  <Project Path="UtilityApp.Modules.Templates/UtilityApp.Modules.Templates.csproj" Id="6f9a25ce-5c83-4a42-9a79-2ba0e4292d3e" />
   <Project Path="UtilityApp/UtilityApp.csproj" Id="a554819e-ae84-40fd-b2e7-8a3902a7a7f2" />
 </Solution>

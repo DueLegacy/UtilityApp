@@ -69,6 +69,12 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="HostContext.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LoadedModule.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -96,5 +102,25 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UtilityApp.Contracts\UtilityApp.Contracts.csproj">
+      <Project>{1C3A0A53-91F3-4B78-9AE4-3C8E7BFDAC17}</Project>
+      <Name>UtilityApp.Contracts</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Target Name="BuildAndStageModules" AfterTargets="Build">
+    <MSBuild Projects="..\UtilityApp.Modules.Templates\UtilityApp.Modules.Templates.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);OutDir=bin\$(Configuration)\;IntermediateOutputPath=obj\$(Configuration)\;"
+             RemoveProperties="BaseIntermediateOutputPath" />
+    <MakeDir Directories="$(OutDir)Modules" />
+    <RemoveDir Directories="$(OutDir)Modules\Templates" Condition="Exists('$(OutDir)Modules\Templates')" />
+    <ItemGroup>
+      <BuiltModule Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.dll" />
+      <BuiltModuleSymbols Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb" Condition="Exists('..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BuiltModule)" DestinationFolder="$(OutDir)Modules" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(BuiltModuleSymbols)" DestinationFolder="$(OutDir)Modules" SkipUnchangedFiles="true" Condition="'@(BuiltModuleSymbols)' != ''" />
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
