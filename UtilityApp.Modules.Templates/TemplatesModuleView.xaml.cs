@@ -79,6 +79,56 @@ namespace UtilityApp.Modules.Templates
             Log("Enabled template edit mode.");
         }
 
+        private void DeleteTemplateButton_Click(object sender, RoutedEventArgs e)
+        {
+            var currentTemplate = FindTemplateById(_selectedTemplateId);
+            if (currentTemplate == null)
+            {
+                Log("Template delete blocked: no template selected.");
+                return;
+            }
+
+            if (MessageBox.Show(
+                    string.Format("Delete the template '{0}'?", currentTemplate.Name),
+                    "Delete Template",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            if (MessageBox.Show(
+                    string.Format("Delete '{0}' permanently? This cannot be undone.", currentTemplate.Name),
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.No) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var removedIndex = _templates.IndexOf(currentTemplate);
+            if (removedIndex < 0)
+            {
+                Log("Template delete failed: selected template is unavailable.");
+                return;
+            }
+
+            _templates.RemoveAt(removedIndex);
+            if (!SaveTemplates())
+            {
+                _templates.Insert(removedIndex, currentTemplate);
+                SortTemplates();
+                RefreshTemplateList(currentTemplate.Id);
+                return;
+            }
+
+            _selectedTemplateId = null;
+            RefreshTemplateList(null);
+            Log(string.Format("Deleted template: {0}.", currentTemplate.Name));
+        }
+
         private void NewTemplateButton_Click(object sender, RoutedEventArgs e)
         {
             _selectedTemplateId = null;
@@ -357,6 +407,7 @@ namespace UtilityApp.Modules.Templates
             TemplateNameTextBox.IsReadOnly = !_isEditMode;
             TemplateContentTextBox.IsReadOnly = !_isEditMode;
             EditTemplateButton.IsEnabled = !_isEditMode && !string.IsNullOrWhiteSpace(_selectedTemplateId);
+            DeleteTemplateButton.IsEnabled = !_isEditMode && !string.IsNullOrWhiteSpace(_selectedTemplateId);
             SaveTemplateButton.IsEnabled = _isEditMode;
 
             if (!focusEditor)
@@ -434,3 +485,4 @@ namespace UtilityApp.Modules.Templates
         }
     }
 }
+

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -30,7 +31,7 @@ namespace UtilityApp
                 AppDomain.CurrentDomain.BaseDirectory,
                 AppendActivity);
 
-            RefreshModuleCatalog(OverviewNavigationId, false);
+            RefreshModuleCatalog(null, false);
             AppendActivity("Host UI shell initialized.");
         }
 
@@ -58,15 +59,8 @@ namespace UtilityApp
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.Equals(GetSelectedNavigationId(), OverviewNavigationId, StringComparison.OrdinalIgnoreCase))
-            {
-                ShowMainSurface();
-                ShowOverviewPanel();
-                AppendActivity("Opened Home workspace.");
-                return;
-            }
-
-            SelectNavigationItem(OverviewNavigationId);
+            ShowOverviewWorkspace();
+            AppendActivity("Opened Home workspace.");
         }
 
         private void DiscoverModulesButton_Click(object sender, RoutedEventArgs e)
@@ -92,6 +86,30 @@ namespace UtilityApp
             }
         }
 
+        private void OpenLogsFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var logsDirectoryPath = _hostContext == null
+                ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs")
+                : _hostContext.LogsDirectoryPath;
+
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = logsDirectoryPath,
+                    UseShellExecute = true
+                });
+
+                ShowOperationsMenu();
+                AppendActivity("Opened Logs folder.");
+            }
+            catch (Exception ex)
+            {
+                ShowOperationsMenu();
+                AppendActivity(string.Format("Failed to open Logs folder: {0}", ex.Message));
+            }
+        }
+
         private void RefreshModuleCatalog(string navigationIdToSelect, bool logDiscovery)
         {
             var previousStates = new Dictionary<string, bool>(_moduleEnabledStates, StringComparer.OrdinalIgnoreCase);
@@ -105,7 +123,8 @@ namespace UtilityApp
             var selectedNavigationId = GetSelectedNavigationId();
             if (string.IsNullOrWhiteSpace(selectedNavigationId))
             {
-                selectedNavigationId = OverviewNavigationId;
+                ShowOverviewWorkspace();
+                return;
             }
 
             ApplyNavigationSelection(selectedNavigationId);
@@ -240,8 +259,6 @@ namespace UtilityApp
                 ModuleList.Items.Clear();
                 _moduleItems.Clear();
 
-                ModuleList.Items.Add(CreateNavigationItem(OverviewNavigationId, "Overview", true));
-
                 foreach (var module in _modules)
                 {
                     var navigationItem = CreateNavigationItem(module.Id, module.Name, IsModuleEnabled(module.Id));
@@ -251,7 +268,7 @@ namespace UtilityApp
 
                 if (!SelectNavigationItemInternal(navigationIdToSelect))
                 {
-                    SelectNavigationItemInternal(OverviewNavigationId);
+                    ModuleList.SelectedIndex = -1;
                 }
             }
             finally
@@ -273,6 +290,12 @@ namespace UtilityApp
 
         private bool SelectNavigationItem(string navigationId)
         {
+            if (string.Equals(navigationId, OverviewNavigationId, StringComparison.OrdinalIgnoreCase))
+            {
+                ShowOverviewWorkspace();
+                return true;
+            }
+
             if (!SelectNavigationItemInternal(navigationId))
             {
                 return false;
@@ -318,9 +341,7 @@ namespace UtilityApp
 
             if (string.Equals(navigationId, OverviewNavigationId, StringComparison.OrdinalIgnoreCase))
             {
-                ActiveModuleTitle.Text = "Overview";
-                ShowMainSurface();
-                ShowOverviewPanel();
+                ShowOverviewWorkspace();
                 AppendActivity("Selected module view: Overview.");
                 return;
             }
@@ -328,13 +349,13 @@ namespace UtilityApp
             LoadedModule module;
             if (!_modulesById.TryGetValue(navigationId, out module))
             {
-                SelectNavigationItem(OverviewNavigationId);
+                ShowOverviewWorkspace();
                 return;
             }
 
             if (!IsModuleEnabled(module.Id))
             {
-                SelectNavigationItem(OverviewNavigationId);
+                ShowOverviewWorkspace();
                 return;
             }
 
@@ -470,7 +491,7 @@ namespace UtilityApp
 
             if (string.Equals(GetSelectedNavigationId(), moduleId, StringComparison.OrdinalIgnoreCase) && !IsModuleEnabled(moduleId))
             {
-                SelectNavigationItem(OverviewNavigationId);
+                ShowOverviewWorkspace();
                 AppendActivity(string.Format("Disabled module: {0}. Returned to Overview.", moduleName));
                 return;
             }
@@ -537,13 +558,23 @@ namespace UtilityApp
 
         private void ShowOverviewPanel()
         {
+            MainSurfaceHeaderCard.Visibility = Visibility.Visible;
             OverviewPanel.Visibility = Visibility.Visible;
             ModuleViewHost.Visibility = Visibility.Collapsed;
             ModuleWorkspaceCard.Visibility = Visibility.Collapsed;
         }
 
+        private void ShowOverviewWorkspace()
+        {
+            ClearNavigationSelection();
+            ActiveModuleTitle.Text = "Overview";
+            ShowMainSurface();
+            ShowOverviewPanel();
+        }
+
         private void ShowModuleView(FrameworkElement moduleView)
         {
+            MainSurfaceHeaderCard.Visibility = Visibility.Collapsed;
             OverviewPanel.Visibility = Visibility.Collapsed;
             ModuleWorkspaceCard.Visibility = Visibility.Collapsed;
             ModuleViewHost.Content = moduleView;
@@ -552,6 +583,7 @@ namespace UtilityApp
 
         private void ShowGenericModuleWorkspace(LoadedModule module)
         {
+            MainSurfaceHeaderCard.Visibility = Visibility.Collapsed;
             OverviewPanel.Visibility = Visibility.Collapsed;
             ModuleViewHost.Visibility = Visibility.Collapsed;
             ModuleWorkspaceCard.Visibility = Visibility.Visible;
@@ -587,8 +619,22 @@ namespace UtilityApp
 
         private void ShowOperationsMenu()
         {
+            ClearNavigationSelection();
             MainSurfacePanel.Visibility = Visibility.Collapsed;
             OperationsMenuPanel.Visibility = Visibility.Visible;
+        }
+
+        private void ClearNavigationSelection()
+        {
+            _suppressModuleSelectionChanged = true;
+            try
+            {
+                ModuleList.SelectedIndex = -1;
+            }
+            finally
+            {
+                _suppressModuleSelectionChanged = false;
+            }
         }
 
         private void AppendActivity(string message)

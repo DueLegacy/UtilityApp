@@ -12,6 +12,7 @@
         <SolidColorBrush x:Key="BodyBrush" Color="#FF455764" />
         <SolidColorBrush x:Key="AccentBrush" Color="#FF1F6E7A" />
         <SolidColorBrush x:Key="AccentMutedBrush" Color="#FFE4F1F4" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#FFB24139" />
 
         <Style x:Key="AccentButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Foreground" Value="White" />
@@ -56,6 +57,12 @@
             <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+        </Style>
+
+        <Style x:Key="DangerGhostButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentButtonStyle}">
+            <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource DangerBrush}" />
         </Style>
 
         <Style x:Key="TemplateListItemStyle" TargetType="{x:Type ListBoxItem}">
@@ -113,17 +120,21 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Grid>
+                <Grid Grid.Row="1" Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Templates"
-                               FontFamily="Bahnschrift"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource HeadingBrush}" />
+
+                    <TextBox x:Name="TemplateSearchTextBox"
+                             Padding="10,8"
+                             FontFamily="Segoe UI"
+                             FontSize="13"
+                             TextChanged="TemplateSearchTextBox_TextChanged" />
+
                     <Border Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
                             Background="{StaticResource AccentMutedBrush}"
                             CornerRadius="10"
                             Padding="10,4">
@@ -135,14 +146,6 @@
                                    Foreground="{StaticResource AccentBrush}" />
                     </Border>
                 </Grid>
-
-                <TextBox x:Name="TemplateSearchTextBox"
-                         Grid.Row="1"
-                         Margin="0,12,0,0"
-                         Padding="10,8"
-                         FontFamily="Segoe UI"
-                         FontSize="13"
-                         TextChanged="TemplateSearchTextBox_TextChanged" />
 
                 <ListBox x:Name="TemplateListBox"
                          Grid.Row="2"
@@ -166,25 +169,35 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Template Editor"
                                FontFamily="Bahnschrift"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource HeadingBrush}" />
-                    <Button x:Name="EditTemplateButton"
-                            Grid.Column="1"
-                            Width="110"
-                            Margin="0,0,10,8"
-                            Content="Edit"
-                            Style="{StaticResource GhostButtonStyle}"
-                            Click="EditTemplateButton_Click" />
-                    <Button Grid.Column="2"
-                            Width="110"
-                            Content="Copy"
-                            Style="{StaticResource GhostButtonStyle}"
-                            Click="CopyTemplateButton_Click" />
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button x:Name="EditTemplateButton"
+                                Width="100"
+                                Margin="0,0,8,8"
+                                Content="Edit"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Click="EditTemplateButton_Click" />
+                        <Button x:Name="CopyTemplateButton"
+                                Width="100"
+                                Margin="0,0,8,8"
+                                Content="Copy"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Click="CopyTemplateButton_Click" />
+                        <Button x:Name="DeleteTemplateButton"
+                                Width="100"
+                                Margin="0,0,0,8"
+                                Content="Delete"
+                                IsEnabled="False"
+                                Style="{StaticResource DangerGhostButtonStyle}"
+                                Click="DeleteTemplateButton_Click" />
+                    </StackPanel>
                 </Grid>
 
                 <TextBlock Margin="0,14,0,0"
@@ -237,3 +250,4 @@
         </Border>
     </Grid>
 </UserControl>
+
