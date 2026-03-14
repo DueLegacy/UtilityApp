@@ -120,6 +120,15 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
+                <Grid Grid.Row="0">
+                    <Button x:Name="NewTemplateButton"
+                            Width="110"
+                            HorizontalAlignment="Right"
+                            Content="New"
+                            Style="{StaticResource GhostButtonStyle}"
+                            Click="NewTemplateButton_Click" />
+                </Grid>
+
                 <Grid Grid.Row="1" Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -178,20 +187,20 @@
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right">
-                        <Button x:Name="EditTemplateButton"
-                                Width="100"
-                                Margin="0,0,8,8"
-                                Content="Edit"
-                                Style="{StaticResource GhostButtonStyle}"
-                                Click="EditTemplateButton_Click" />
                         <Button x:Name="CopyTemplateButton"
-                                Width="100"
+                                Width="104"
                                 Margin="0,0,8,8"
                                 Content="Copy"
                                 Style="{StaticResource GhostButtonStyle}"
                                 Click="CopyTemplateButton_Click" />
+                        <Button x:Name="EditTemplateButton"
+                                Width="104"
+                                Margin="0,0,8,8"
+                                Content="Edit"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Click="EditTemplateButton_Click" />
                         <Button x:Name="DeleteTemplateButton"
-                                Width="100"
+                                Width="104"
                                 Margin="0,0,0,8"
                                 Content="Delete"
                                 IsEnabled="False"
@@ -231,23 +240,12 @@
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Auto" />
 
-                <StackPanel Margin="0,14,0,0"
-                            Orientation="Horizontal">
-                    <Button x:Name="NewTemplateButton"
-                            Width="110"
-                            Content="New"
-                            Style="{StaticResource GhostButtonStyle}"
-                            Click="NewTemplateButton_Click" />
-                    <Button x:Name="SaveTemplateButton"
-                            Width="110"
-                            Margin="10,0,0,8"
-                            Content="Save"
-                            IsEnabled="False"
-                            Style="{StaticResource AccentButtonStyle}"
-                            Click="SaveTemplateButton_Click" />
-                </StackPanel>
+
             </StackPanel>
         </Border>
     </Grid>
 </UserControl>
+
+
+
 

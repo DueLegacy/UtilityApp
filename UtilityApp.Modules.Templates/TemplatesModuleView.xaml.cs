@@ -64,11 +64,16 @@ namespace UtilityApp.Modules.Templates
             }
 
             LoadTemplateIntoEditor(template);
-            CopyTemplateToClipboard(template.Name, template.Content);
         }
 
         private void EditTemplateButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_isEditMode)
+            {
+                SaveCurrentTemplate();
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(_selectedTemplateId))
             {
                 Log("Edit mode blocked: no template selected.");
@@ -148,7 +153,7 @@ namespace UtilityApp.Modules.Templates
             Log("Started a new template draft.");
         }
 
-        private void SaveTemplateButton_Click(object sender, RoutedEventArgs e)
+        private void SaveCurrentTemplate()
         {
             var templateName = (TemplateNameTextBox.Text ?? string.Empty).Trim();
             var templateContent = TemplateContentTextBox.Text ?? string.Empty;
@@ -406,9 +411,10 @@ namespace UtilityApp.Modules.Templates
 
             TemplateNameTextBox.IsReadOnly = !_isEditMode;
             TemplateContentTextBox.IsReadOnly = !_isEditMode;
-            EditTemplateButton.IsEnabled = !_isEditMode && !string.IsNullOrWhiteSpace(_selectedTemplateId);
+            EditTemplateButton.Content = _isEditMode ? "Save" : "Edit";
+            EditTemplateButton.Style = (Style)FindResource(_isEditMode ? "AccentButtonStyle" : "GhostButtonStyle");
+            EditTemplateButton.IsEnabled = _isEditMode || !string.IsNullOrWhiteSpace(_selectedTemplateId);
             DeleteTemplateButton.IsEnabled = !_isEditMode && !string.IsNullOrWhiteSpace(_selectedTemplateId);
-            SaveTemplateButton.IsEnabled = _isEditMode;
 
             if (!focusEditor)
             {
@@ -485,4 +491,6 @@ namespace UtilityApp.Modules.Templates
         }
     }
 }
+
+
 
