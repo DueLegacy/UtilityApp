@@ -228,24 +228,24 @@
                            FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource HeadingBrush}" />
-                <TextBox x:Name="TemplateContentTextBox"
-                         Margin="0,8,0,0"
-                         MinHeight="420"
-                         Padding="10"
-                         FontFamily="Consolas"
-                         FontSize="12"
-                         IsReadOnly="True"
-                         AcceptsReturn="True"
-                         AcceptsTab="True"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto" />
-
-
+                <Border Margin="0,8,0,0"
+                        MinHeight="420"
+                        BorderBrush="{StaticResource PanelBorderBrush}"
+                        BorderThickness="1"
+                        Background="#FFFFFFFF"
+                        CornerRadius="6">
+                    <RichTextBox x:Name="TemplateContentRichTextBox"
+                                 Padding="10"
+                                 FontFamily="Segoe UI"
+                                 FontSize="13"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 IsReadOnly="True"
+                                 AcceptsTab="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 SpellCheck.IsEnabled="False" />
+                </Border>
             </StackPanel>
         </Border>
     </Grid>
 </UserControl>
-
-
-
-

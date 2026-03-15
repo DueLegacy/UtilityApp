@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Xml.Serialization;
 using UtilityApp.Contracts;
 
@@ -10,6 +12,8 @@ namespace UtilityApp.Modules.Templates
 {
     public partial class TemplatesModuleView : UserControl
     {
+        private static readonly Encoding RtfEncoding = Encoding.GetEncoding(28591);
+
         private readonly IHostContext _hostContext;
         private readonly List<TemplateItem> _templates = new List<TemplateItem>();
         private readonly string _templateStorePath;
@@ -27,6 +31,7 @@ namespace UtilityApp.Modules.Templates
                 _hostContext == null ? AppDomain.CurrentDomain.BaseDirectory : _hostContext.ConfigDirectoryPath,
                 "templates.xml");
 
+            InitializeEditorDocument();
             LoadTemplates();
             RefreshTemplateList(null);
             SetEditMode(false, false);
@@ -156,7 +161,8 @@ namespace UtilityApp.Modules.Templates
         private void SaveCurrentTemplate()
         {
             var templateName = (TemplateNameTextBox.Text ?? string.Empty).Trim();
-            var templateContent = TemplateContentTextBox.Text ?? string.Empty;
+            var templateContent = GetEditorPlainText();
+            var templateContentRtf = GetEditorRtf();
 
             if (string.IsNullOrWhiteSpace(templateName))
             {
@@ -183,6 +189,7 @@ namespace UtilityApp.Modules.Templates
 
             currentTemplate.Name = templateName;
             currentTemplate.Content = templateContent;
+            currentTemplate.ContentRtf = templateContentRtf;
 
             SortTemplates();
 
@@ -203,9 +210,7 @@ namespace UtilityApp.Modules.Templates
         private void CopyTemplateButton_Click(object sender, RoutedEventArgs e)
         {
             var templateName = (TemplateNameTextBox.Text ?? string.Empty).Trim();
-            var templateContent = TemplateContentTextBox.Text ?? string.Empty;
-
-            CopyTemplateToClipboard(templateName, templateContent);
+            CopyTemplateToClipboard(templateName);
         }
 
         private void LoadTemplates()
@@ -241,6 +246,11 @@ namespace UtilityApp.Modules.Templates
                             if (template.Content == null)
                             {
                                 template.Content = string.Empty;
+                            }
+
+                            if (template.ContentRtf == null)
+                            {
+                                template.ContentRtf = string.Empty;
                             }
 
                             _templates.Add(template);
@@ -395,14 +405,14 @@ namespace UtilityApp.Modules.Templates
 
             _selectedTemplateId = template.Id;
             TemplateNameTextBox.Text = template.Name ?? string.Empty;
-            TemplateContentTextBox.Text = template.Content ?? string.Empty;
+            LoadTemplateContentIntoEditor(template);
             SetEditMode(false, false);
         }
 
         private void ClearEditor()
         {
             TemplateNameTextBox.Text = string.Empty;
-            TemplateContentTextBox.Text = string.Empty;
+            ClearRichTextEditor();
         }
 
         private void SetEditMode(bool isEditMode, bool focusEditor)
@@ -410,7 +420,7 @@ namespace UtilityApp.Modules.Templates
             _isEditMode = isEditMode;
 
             TemplateNameTextBox.IsReadOnly = !_isEditMode;
-            TemplateContentTextBox.IsReadOnly = !_isEditMode;
+            TemplateContentRichTextBox.IsReadOnly = !_isEditMode;
             EditTemplateButton.Content = _isEditMode ? "Save" : "Edit";
             EditTemplateButton.Style = (Style)FindResource(_isEditMode ? "AccentButtonStyle" : "GhostButtonStyle");
             EditTemplateButton.IsEnabled = _isEditMode || !string.IsNullOrWhiteSpace(_selectedTemplateId);
@@ -427,7 +437,7 @@ namespace UtilityApp.Modules.Templates
                 return;
             }
 
-            TemplateContentTextBox.Focus();
+            TemplateContentRichTextBox.Focus();
         }
 
         private void SortTemplates()
@@ -440,9 +450,121 @@ namespace UtilityApp.Modules.Templates
             });
         }
 
-        private bool CopyTemplateToClipboard(string templateName, string templateContent)
+        private void InitializeEditorDocument()
         {
-            if (string.IsNullOrEmpty(templateContent))
+            TemplateContentRichTextBox.Document = CreateEmptyDocument();
+        }
+
+        private static FlowDocument CreateEmptyDocument()
+        {
+            var document = new FlowDocument();
+            document.PagePadding = new Thickness(0);
+            document.Blocks.Clear();
+            document.Blocks.Add(new Paragraph());
+            return document;
+        }
+
+        private void ClearRichTextEditor()
+        {
+            TemplateContentRichTextBox.Document = CreateEmptyDocument();
+        }
+
+        private TextRange GetTemplateContentRange()
+        {
+            if (TemplateContentRichTextBox.Document == null)
+            {
+                InitializeEditorDocument();
+            }
+
+            return new TextRange(
+                TemplateContentRichTextBox.Document.ContentStart,
+                TemplateContentRichTextBox.Document.ContentEnd);
+        }
+
+        private void LoadTemplateContentIntoEditor(TemplateItem template)
+        {
+            if (template == null)
+            {
+                ClearRichTextEditor();
+                return;
+            }
+
+            if (TryLoadRtfIntoEditor(template.ContentRtf))
+            {
+                return;
+            }
+
+            SetEditorPlainText(template.Content ?? string.Empty);
+        }
+
+        private void SetEditorPlainText(string text)
+        {
+            ClearRichTextEditor();
+            GetTemplateContentRange().Text = text ?? string.Empty;
+            ApplyEditorDocumentLayout();
+        }
+
+        private bool TryLoadRtfIntoEditor(string contentRtf)
+        {
+            if (string.IsNullOrWhiteSpace(contentRtf))
+            {
+                return false;
+            }
+
+            try
+            {
+                using (var stream = new MemoryStream(RtfEncoding.GetBytes(contentRtf)))
+                {
+                    GetTemplateContentRange().Load(stream, DataFormats.Rtf);
+                }
+
+                ApplyEditorDocumentLayout();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void ApplyEditorDocumentLayout()
+        {
+            if (TemplateContentRichTextBox.Document != null)
+            {
+                TemplateContentRichTextBox.Document.PagePadding = new Thickness(0);
+            }
+        }
+
+        private string GetEditorPlainText()
+        {
+            return NormalizePlainText(GetTemplateContentRange().Text);
+        }
+
+        private string GetEditorRtf()
+        {
+            using (var stream = new MemoryStream())
+            {
+                GetTemplateContentRange().Save(stream, DataFormats.Rtf);
+                return RtfEncoding.GetString(stream.ToArray());
+            }
+        }
+
+        private static string NormalizePlainText(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            return text.EndsWith("\r\n", StringComparison.Ordinal)
+                ? text.Substring(0, text.Length - 2)
+                : text;
+        }
+
+        private bool CopyTemplateToClipboard(string templateName)
+        {
+            var templateContent = GetEditorPlainText();
+            if (string.IsNullOrWhiteSpace(templateContent))
             {
                 Log("Clipboard copy skipped: template content is empty.");
                 return false;
@@ -450,7 +572,17 @@ namespace UtilityApp.Modules.Templates
 
             try
             {
-                Clipboard.SetText(templateContent);
+                var dataObject = new DataObject();
+                dataObject.SetData(DataFormats.UnicodeText, templateContent);
+                dataObject.SetData(DataFormats.Text, templateContent);
+
+                var templateContentRtf = GetEditorRtf();
+                if (!string.IsNullOrWhiteSpace(templateContentRtf))
+                {
+                    dataObject.SetData(DataFormats.Rtf, templateContentRtf);
+                }
+
+                Clipboard.SetDataObject(dataObject, true);
                 Log(string.IsNullOrWhiteSpace(templateName)
                     ? "Copied template content to clipboard."
                     : string.Format("Copied template content: {0}.", templateName));
@@ -491,6 +623,3 @@ namespace UtilityApp.Modules.Templates
         }
     }
 }
-
-
-

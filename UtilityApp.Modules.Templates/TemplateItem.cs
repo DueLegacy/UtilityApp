@@ -7,5 +7,7 @@ namespace UtilityApp.Modules.Templates
         public string Name { get; set; }
 
         public string Content { get; set; }
+
+        public string ContentRtf { get; set; }
     }
 }
