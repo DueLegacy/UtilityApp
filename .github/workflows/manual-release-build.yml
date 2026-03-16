@@ -46,7 +46,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $zipPath = 'UtilityApp\bin\Release\UtilityApp.zip'
+          $zipPath = 'UtilityApp.zip'
           if (-not (Test-Path $zipPath)) {
             throw "Expected package was not generated: $zipPath"
           }
@@ -57,10 +57,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: utilityapp-release-package
-          path: UtilityApp/bin/Release/UtilityApp.zip
+          path: UtilityApp.zip
           if-no-files-found: error
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
         with:
-          subject-path: UtilityApp/bin/Release/UtilityApp.zip
+          subject-path: UtilityApp.zip
+

@@ -110,25 +110,28 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
-    <PackageRootPath>$(OutDir)PackageRoot\</PackageRootPath>
+    <EffectiveOutputPath Condition="'$(OutDir)' != ''">$(OutDir)</EffectiveOutputPath>
+    <EffectiveOutputPath Condition="'$(EffectiveOutputPath)' == ''">$(OutputPath)</EffectiveOutputPath>
+    <EffectiveOutputPath>$([MSBuild]::EnsureTrailingSlash('$(EffectiveOutputPath)'))</EffectiveOutputPath>
+    <PackageRootPath>$(MSBuildProjectDirectory)\obj\$(Configuration)\PackageRoot\</PackageRootPath>
     <PackageAppRootPath>$(PackageRootPath)UtilityApp\</PackageAppRootPath>
-    <PackageZipPath>$(OutDir)UtilityApp.zip</PackageZipPath>
+    <PackageZipPath>$(MSBuildProjectDirectory)\..\UtilityApp.zip</PackageZipPath>
   </PropertyGroup>
   <Target Name="BuildAndStageModules" AfterTargets="Build">
     <MSBuild Projects="..\UtilityApp.Modules.Templates\UtilityApp.Modules.Templates.csproj"
              Targets="Build"
              Properties="Configuration=$(Configuration);OutDir=bin\$(Configuration)\;IntermediateOutputPath=obj\$(Configuration)\;"
              RemoveProperties="BaseIntermediateOutputPath" />
-    <MakeDir Directories="$(OutDir)Modules" />
-    <RemoveDir Directories="$(OutDir)Modules\Templates" Condition="Exists('$(OutDir)Modules\Templates')" />
+    <MakeDir Directories="$(EffectiveOutputPath)Modules" />
+    <RemoveDir Directories="$(EffectiveOutputPath)Modules\Templates" Condition="Exists('$(EffectiveOutputPath)Modules\Templates')" />
     <ItemGroup>
       <BuiltModule Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.dll" />
       <BuiltModuleSymbols Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb"
                           Condition="'$(Configuration)' != 'Release' and Exists('..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb')" />
-      <ReleaseSymbolFiles Include="$(OutDir)**\*.pdb" Condition="'$(Configuration)' == 'Release'" />
+      <ReleaseSymbolFiles Include="$(EffectiveOutputPath)**\*.pdb" Condition="'$(Configuration)' == 'Release'" />
     </ItemGroup>
-    <Copy SourceFiles="@(BuiltModule)" DestinationFolder="$(OutDir)Modules" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(BuiltModuleSymbols)" DestinationFolder="$(OutDir)Modules" SkipUnchangedFiles="true" Condition="'@(BuiltModuleSymbols)' != ''" />
+    <Copy SourceFiles="@(BuiltModule)" DestinationFolder="$(EffectiveOutputPath)Modules" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(BuiltModuleSymbols)" DestinationFolder="$(EffectiveOutputPath)Modules" SkipUnchangedFiles="true" Condition="'@(BuiltModuleSymbols)' != ''" />
     <Delete Files="@(ReleaseSymbolFiles)" Condition="'$(Configuration)' == 'Release' and '@(ReleaseSymbolFiles)' != ''" />
   </Target>
   <Target Name="CreateDeploymentZip" AfterTargets="BuildAndStageModules" Condition="'$(Configuration)' == 'Release'">
@@ -138,8 +141,8 @@
     <MakeDir Directories="$(PackageAppRootPath)Config" />
     <MakeDir Directories="$(PackageAppRootPath)Logs" />
     <ItemGroup>
-      <PackageFiles Include="$(OutDir)**\*"
-                    Exclude="$(PackageRootPath)**;$(PackageZipPath);$(OutDir)**\*.pdb" />
+      <PackageFiles Include="$(EffectiveOutputPath)**\*"
+                    Exclude="$(EffectiveOutputPath)**\*.pdb" />
     </ItemGroup>
     <Copy SourceFiles="@(PackageFiles)"
           DestinationFiles="@(PackageFiles->'$(PackageAppRootPath)%(RecursiveDir)%(Filename)%(Extension)')"
@@ -147,7 +150,10 @@
     <ZipDirectory SourceDirectory="$(PackageRootPath)"
                   DestinationFile="$(PackageZipPath)"
                   Overwrite="true" />
+    <RemoveDir Directories="$(PackageRootPath)" Condition="Exists('$(PackageRootPath)')" />
   </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
+
 
