@@ -1,0 +1,66 @@
+name: Manual Release Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    runs-on: windows-2022
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Locate MSBuild
+        id: msbuild
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          if (-not (Test-Path $vswhere)) {
+            throw 'vswhere.exe not found on the runner.'
+          }
+
+          $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\amd64\MSBuild.exe' | Select-Object -First 1
+          if (-not $msbuild) {
+            throw 'MSBuild.exe not found on the runner.'
+          }
+
+          "path=$msbuild" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build Release package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & "${{ steps.msbuild.outputs.path }}" 'UtilityApp\UtilityApp.csproj' /t:Build /p:Configuration=Release
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+      - name: Verify packaged zip
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $zipPath = 'UtilityApp\bin\Release\UtilityApp.zip'
+          if (-not (Test-Path $zipPath)) {
+            throw "Expected package was not generated: $zipPath"
+          }
+
+          Get-Item $zipPath | Format-List FullName, Length, LastWriteTime
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: utilityapp-release-package
+          path: UtilityApp/bin/Release/UtilityApp.zip
+          if-no-files-found: error
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: UtilityApp/bin/Release/UtilityApp.zip
