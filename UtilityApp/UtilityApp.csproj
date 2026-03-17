@@ -122,12 +122,19 @@
              Targets="Build"
              Properties="Configuration=$(Configuration);OutDir=bin\$(Configuration)\;IntermediateOutputPath=obj\$(Configuration)\;"
              RemoveProperties="BaseIntermediateOutputPath" />
+    <MSBuild Projects="..\UtilityApp.Modules.BusinessRequirements\UtilityApp.Modules.BusinessRequirements.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration);OutDir=bin\$(Configuration)\;IntermediateOutputPath=obj\$(Configuration)\;"
+             RemoveProperties="BaseIntermediateOutputPath" />
     <MakeDir Directories="$(EffectiveOutputPath)Modules" />
     <RemoveDir Directories="$(EffectiveOutputPath)Modules\Templates" Condition="Exists('$(EffectiveOutputPath)Modules\Templates')" />
     <ItemGroup>
       <BuiltModule Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.dll" />
+      <BuiltModule Include="..\UtilityApp.Modules.BusinessRequirements\bin\$(Configuration)\BusinessRequirementsModule.dll" />
       <BuiltModuleSymbols Include="..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb"
                           Condition="'$(Configuration)' != 'Release' and Exists('..\UtilityApp.Modules.Templates\bin\$(Configuration)\TemplatesModule.pdb')" />
+      <BuiltModuleSymbols Include="..\UtilityApp.Modules.BusinessRequirements\bin\$(Configuration)\BusinessRequirementsModule.pdb"
+                          Condition="'$(Configuration)' != 'Release' and Exists('..\UtilityApp.Modules.BusinessRequirements\bin\$(Configuration)\BusinessRequirementsModule.pdb')" />
       <ReleaseSymbolFiles Include="$(EffectiveOutputPath)**\*.pdb" Condition="'$(Configuration)' == 'Release'" />
     </ItemGroup>
     <Copy SourceFiles="@(BuiltModule)" DestinationFolder="$(EffectiveOutputPath)Modules" SkipUnchangedFiles="true" />
@@ -154,6 +161,7 @@
   </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
 
 
 

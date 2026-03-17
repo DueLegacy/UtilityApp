@@ -20,3 +20,6 @@ Logs/
 
 # Test results
 TestResults/
+
+# Packed Zip
+*.zip
