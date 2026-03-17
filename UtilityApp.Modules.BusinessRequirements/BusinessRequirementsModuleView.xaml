@@ -82,23 +82,16 @@
 
         <Border Grid.Row="0" Style="{StaticResource SectionBorderStyle}">
             <StackPanel>
-                <TextBlock Text="AIO.py Report Module"
+                <TextBlock Text="Report Module"
                            FontFamily="Bahnschrift"
                            FontSize="20"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource HeadingBrush}" />
-                <TextBlock Margin="0,8,0,0"
-                           Text="Runs the same workbook analysis as AIO.py and saves the result as stat.txt beside the selected workbook."
-                           FontFamily="Segoe UI"
-                           FontSize="13"
-                           TextWrapping="Wrap"
-                           Foreground="{StaticResource BodyBrush}" />
 
                 <Grid Margin="0,16,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="130" />
-                        <ColumnDefinition Width="130" />
+                        <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
 
                     <TextBox x:Name="WorkbookPathTextBox"
@@ -109,18 +102,11 @@
                              TextChanged="WorkbookPathTextBox_TextChanged" />
 
                     <Button x:Name="BrowseWorkbookButton"
-                            Grid.Column="1"
-                            Margin="10,0,0,0"
-                            Content="Browse Workbook"
-                            Style="{StaticResource GhostButtonStyle}"
-                            Click="BrowseWorkbookButton_Click" />
-
-                    <Button x:Name="UseDefaultWorkbookButton"
-                            Grid.Column="2"
-                            Margin="10,0,0,0"
-                            Content="Use Default"
-                            Style="{StaticResource GhostButtonStyle}"
-                            Click="UseDefaultWorkbookButton_Click" />
+                             Grid.Column="1"
+                             Margin="10,0,0,0"
+                             Content="Browse Workbook"
+                             Style="{StaticResource GhostButtonStyle}"
+                             Click="BrowseWorkbookButton_Click" />
                 </Grid>
 
                 <Grid Margin="0,14,0,0">
@@ -128,7 +114,7 @@
                         <ColumnDefinition Width="110" />
                         <ColumnDefinition Width="160" />
                         <ColumnDefinition Width="120" />
-                        <ColumnDefinition Width="180" />
+                        <ColumnDefinition Width="200" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="150" />
                     </Grid.ColumnDefinitions>
@@ -137,6 +123,7 @@
                         <TextBlock Text="Year" Style="{StaticResource FieldLabelStyle}" />
                         <TextBox x:Name="YearTextBox"
                                  Margin="0,8,0,0"
+                                 Height="34"
                                  Padding="10,8"
                                  FontFamily="Segoe UI"
                                  FontSize="13" />
@@ -146,6 +133,7 @@
                         <TextBlock Text="Period Type" Style="{StaticResource FieldLabelStyle}" />
                         <ComboBox x:Name="PeriodTypeComboBox"
                                   Margin="0,8,0,0"
+                                  Height="34"
                                   Padding="6"
                                   FontFamily="Segoe UI"
                                   FontSize="13"
@@ -161,6 +149,7 @@
                         <TextBlock Text="Value" Style="{StaticResource FieldLabelStyle}" />
                         <ComboBox x:Name="PeriodValueComboBox"
                                   Margin="0,8,0,0"
+                                  Height="34"
                                   Padding="6"
                                   FontFamily="Segoe UI"
                                   FontSize="13" />
@@ -170,25 +159,17 @@
                         <TextBlock Text="Options" Style="{StaticResource FieldLabelStyle}" />
                         <CheckBox x:Name="ShowProgressCheckBox"
                                   Margin="0,12,0,0"
-                                  Content="Show in-progress BR titles"
                                   FontFamily="Segoe UI"
                                   FontSize="13"
-                                  Foreground="{StaticResource BodyBrush}" />
+                                  Foreground="{StaticResource BodyBrush}">
+                            <TextBlock Text="Show in-progress BR titles"
+                                       TextWrapping="Wrap" />
+                        </CheckBox>
                     </StackPanel>
 
-                    <TextBlock x:Name="StatusTextBlock"
-                               Grid.Column="4"
-                               Margin="16,20,16,0"
-                               Text="Select a workbook and run analysis."
-                               TextWrapping="Wrap"
-                               FontFamily="Segoe UI"
-                               FontSize="13"
-                               Foreground="{StaticResource BodyBrush}"
-                               VerticalAlignment="Center" />
-
                     <Button x:Name="RunAnalysisButton"
-                            Grid.Column="5"
-                            Margin="0,20,0,0"
+                             Grid.Column="5"
+                             Margin="0,20,0,0"
                             Height="38"
                             Content="Run Analysis"
                             Style="{StaticResource AccentButtonStyle}"
@@ -204,12 +185,6 @@
                            FontSize="18"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource HeadingBrush}" />
-                <TextBlock Margin="0,8,0,0"
-                           Text="The generated report is written as stat.txt in the same folder as the selected workbook."
-                           FontFamily="Segoe UI"
-                           FontSize="13"
-                           TextWrapping="Wrap"
-                           Foreground="{StaticResource BodyBrush}" />
 
                 <TextBlock Margin="0,16,0,0"
                            Text="Output File"
@@ -234,3 +209,4 @@
         </Border>
     </Grid>
 </UserControl>
+

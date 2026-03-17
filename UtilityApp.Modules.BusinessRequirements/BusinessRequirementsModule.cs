@@ -16,7 +16,7 @@ namespace UtilityApp.Modules.BusinessRequirements
 
         public string Description
         {
-            get { return "Analyze Export.xlsx with the same business requirement summaries produced by AIO.py."; }
+            get { return "Business Requirement summaries."; }
         }
 
         public bool EnabledByDefault

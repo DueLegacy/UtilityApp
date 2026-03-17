@@ -5,7 +5,6 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using UtilityApp.Contracts;
 
 namespace UtilityApp.Modules.BusinessRequirements
@@ -14,16 +13,12 @@ namespace UtilityApp.Modules.BusinessRequirements
     {
         private readonly BusinessRequirementAnalyzer _analyzer = new BusinessRequirementAnalyzer();
         private readonly IHostContext _hostContext;
-        private readonly string _defaultWorkbookPath;
 
         public BusinessRequirementsModuleView(IHostContext hostContext)
         {
             InitializeComponent();
 
             _hostContext = hostContext;
-            _defaultWorkbookPath = Path.Combine(GetApplicationRootPath(), "Export.xlsx");
-
-            WorkbookPathTextBox.Text = _defaultWorkbookPath;
             YearTextBox.Text = DateTime.Today.Year.ToString(CultureInfo.InvariantCulture);
             PeriodTypeComboBox.SelectedIndex = 0;
             UpdatePeriodValueChoices();
@@ -60,15 +55,9 @@ namespace UtilityApp.Modules.BusinessRequirements
             if (dialog.ShowDialog() == true)
             {
                 WorkbookPathTextBox.Text = dialog.FileName;
-                ShowStatus("Workbook path updated.", (Brush)FindResource("BodyBrush"));
             }
         }
 
-        private void UseDefaultWorkbookButton_Click(object sender, RoutedEventArgs e)
-        {
-            WorkbookPathTextBox.Text = _defaultWorkbookPath;
-            ShowStatus("Reset workbook path to the default Export.xlsx location.", (Brush)FindResource("BodyBrush"));
-        }
 
         private void PeriodTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -84,8 +73,6 @@ namespace UtilityApp.Modules.BusinessRequirements
         {
             try
             {
-                ShowStatus("Running analysis...", (Brush)FindResource("BodyBrush"));
-
                 var options = BuildAnalysisOptions();
                 var result = _analyzer.Analyze(options);
                 var outputFilePath = GetOutputFilePath(result.WorkbookPath);
@@ -99,17 +86,11 @@ namespace UtilityApp.Modules.BusinessRequirements
                     result.PeriodLabel,
                     ToAppRelativePath(outputFilePath)));
 
-                ShowStatus(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Saved report to {0}.",
-                        ToAppRelativePath(outputFilePath)),
-                    (Brush)FindResource("GoodBrush"));
+
             }
             catch (Exception ex)
             {
-                LastRunSummaryTextBlock.Text = "Run failed. No report was written.";
-                ShowStatus(ex.Message, (Brush)FindResource("ErrorBrush"));
+                LastRunSummaryTextBlock.Text = "Run failed: " + ex.Message;
                 Log("Business requirements analysis failed: " + ex.Message);
             }
         }
@@ -266,11 +247,6 @@ namespace UtilityApp.Modules.BusinessRequirements
             return Path.Combine(directoryPath, "stat.txt");
         }
 
-        private void ShowStatus(string message, Brush brush)
-        {
-            StatusTextBlock.Text = message ?? string.Empty;
-            StatusTextBlock.Foreground = brush ?? (Brush)FindResource("BodyBrush");
-        }
 
         private string GetApplicationRootPath()
         {
@@ -304,5 +280,6 @@ namespace UtilityApp.Modules.BusinessRequirements
         }
     }
 }
+
 
 
